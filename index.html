@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOWERN Climate Factors Quiz</title>
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --error-color: #dc3545;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .match-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .factor-list, .description-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .factor-item, .description-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-weight: bold;
+            font-size: 1.1em;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .factor-item {
+            background-color: #e0f7fa; /* Light Blue */
+            border-left: 5px solid var(--primary-color);
+        }
+
+        .description-item {
+            background-color: #fff3e0; /* Light Orange */
+            border-right: 5px solid var(--primary-color);
+            font-weight: normal;
+        }
+
+        .factor-item:hover, .description-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .selected {
+            border: 2px solid var(--success-color) !important;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.5) !important;
+            background-color: #d4edda !important;
+        }
+
+        #feedback {
+            margin-top: 25px;
+            padding: 15px;
+            border-radius: 8px;
+            min-height: 50px;
+            font-size: 1em;
+            text-align: center;
+            line-height: 1.5;
+            background-color: #fff;
+            border: 1px solid var(--secondary-color);
+            display: none; /* Hidden until interaction */
+        }
+
+        .correct {
+            background-color: #d4edda;
+            border-color: var(--success-color);
+            color: var(--success-color);
+        }
+
+        .incorrect {
+            background-color: #f8d7da;
+            border-color: var(--error-color);
+            color: var(--error-color);
+        }
+
+        .feedback-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .reset-btn {
+            display: block;
+            width: 150px;
+            padding: 10px;
+            margin: 20px auto 0;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s;
+        }
+
+        .reset-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌎 LOWERN Climate Factors: Matching Challenge</h1>
+        <p>Match the LOWERN Factor on the left to its correct description and effect on the right. Select one from each column to make a match.</p>
+        
+        <div class="match-area">
+            <ul class="factor-list" id="factor-list"></ul>
+            <ul class="description-list" id="description-list"></ul>
+        </div>
+        
+        <div id="feedback" style="display: none;"></div>
+
+        <button class="reset-btn" onclick="initGame()">Reset Game</button>
+    </div>
+
+    <script>
+        const matches = [
+            {
+                factor: "Latitude (L)",
+                id: "L",
+                description: "Determines how concentrated or spread out the sun's energy is. Near the equator (0°), light is direct and concentrated (hot). Near the poles (60°N/S), it is indirect and spread out (cold)."
+            },
+            {
+                factor: "Ocean Currents (O)",
+                id: "O",
+                description: "Like a 'river within the ocean.' Warm currents (e.g., Gulf Stream) carry heat, warming the air above it, which then affects the climate of nearby land."
+            },
+            {
+                factor: "Relief (R)",
+                id: "R",
+                description: "Causes a 'rain shadow' effect. Moist air rises over a mountain, cools, and drops precipitation (rain) on the windward side, leaving only dry air for the leeward side."
+            },
+            {
+                factor: "Near Water (N)",
+                id: "N",
+                description: "Large bodies of water take longer to heat up and cool down. This moderates the climate, making coastal areas cooler in summer and warmer in winter than inland areas."
+            }
+        ];
+
+        let selectedFactor = null;
+        let selectedDescription = null;
+        let matchedIds = [];
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function initGame() {
+            selectedFactor = null;
+            selectedDescription = null;
+            matchedIds = [];
+            document.getElementById('feedback').style.display = 'none';
+            document.getElementById('feedback').className = '';
+            document.getElementById('feedback').innerHTML = '';
+
+            const factorList = document.getElementById('factor-list');
+            const descriptionList = document.getElementById('description-list');
+            factorList.innerHTML = '';
+            descriptionList.innerHTML = '';
+
+            const factorData = matches.map(m => ({ id: m.id, text: m.factor }));
+            const descriptionData = matches.map(m => ({ id: m.id, text: m.description }));
+
+            shuffleArray(factorData);
+            shuffleArray(descriptionData);
+
+            factorData.forEach(data => {
+                const li = document.createElement('li');
+                li.className = 'factor-item';
+                li.textContent = data.text;
+                li.dataset.id = data.id;
+                li.onclick = () => selectFactor(li);
+                factorList.appendChild(li);
+            });
+
+            descriptionData.forEach(data => {
+                const li = document.createElement('li');
+                li.className = 'description-item';
+                li.textContent = data.text;
+                li.dataset.id = data.id;
+                li.onclick = () => selectDescription(li);
+                descriptionList.appendChild(li);
+            });
+        }
+
+        function clearSelections() {
+            document.querySelectorAll('.factor-item, .description-item').forEach(el => {
+                el.classList.remove('selected');
+            });
+            selectedFactor = null;
+            selectedDescription = null;
+        }
+
+        function selectFactor(element) {
+            if (matchedIds.includes(element.dataset.id)) return;
+            document.querySelectorAll('.factor-item').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedFactor = element;
+            checkMatch();
+        }
+
+        function selectDescription(element) {
+            if (matchedIds.includes(element.dataset.id)) return;
+            document.querySelectorAll('.description-item').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedDescription = element;
+            checkMatch();
+        }
+
+        function checkMatch() {
+            const feedbackEl = document.getElementById('feedback');
+            feedbackEl.style.display = 'none';
+            feedbackEl.className = '';
+
+            if (selectedFactor && selectedDescription) {
+                const factorId = selectedFactor.dataset.id;
+                const descId = selectedDescription.dataset.id;
+                const matchInfo = matches.find(m => m.id === factorId);
+
+                if (factorId === descId) {
+                    // Correct Match
+                    matchedIds.push(factorId);
+                    
+                    selectedFactor.classList.add('correct');
+                    selectedDescription.classList.add('correct');
+                    selectedFactor.onclick = null;
+                    selectedDescription.onclick = null;
+                    
+                    feedbackEl.classList.add('correct');
+                    feedbackEl.innerHTML = `<span class="feedback-title">✅ Correct Match! (${matchInfo.factor})</span><br>
+                                            **CONCEPT RULE**: ${matchInfo.description}`;
+                    
+                } else {
+                    // Incorrect Match
+                    feedbackEl.classList.add('incorrect');
+                    feedbackEl.innerHTML = `<span class="feedback-title">❌ Incorrect Match!</span><br>
+                                            Try again. Remember: **${selectedFactor.textContent}** refers to the **${matchInfo.description.substring(0, 10).toLowerCase()}...** not this description.`;
+                }
+
+                feedbackEl.style.display = 'block';
+                clearSelections();
+                
+                // Check for game completion
+                if (matchedIds.length === matches.length) {
+                    feedbackEl.classList.remove('incorrect');
+                    feedbackEl.classList.add('correct');
+                    feedbackEl.innerHTML = `<span class="feedback-title">🎉 Excellent Work! Game Complete!</span><br>
+                                            You've successfully mastered the key mechanisms of the LOWERN climate factors. Ready for your test!`;
+                }
+            }
+        }
+
+        // Initialize the game when the page loads
+        document.addEventListener('DOMContentLoaded', initGame);
+    </script>
+</body>
+</html>
