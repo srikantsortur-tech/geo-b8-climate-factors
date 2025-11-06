@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LOWERN Climate Factors Quiz</title>
+    <title>LOWERN Climate Factors Visual Challenge</title>
     <style>
         :root {
             --primary-color: #007bff;
@@ -58,7 +58,6 @@
             border-radius: 8px;
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s;
-            font-weight: bold;
             font-size: 1.1em;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
@@ -66,12 +65,17 @@
         .factor-item {
             background-color: #e0f7fa; /* Light Blue */
             border-left: 5px solid var(--primary-color);
+            font-weight: bold;
+        }
+        
+        .factor-item .emoji {
+            margin-right: 8px;
+            font-size: 1.2em;
         }
 
         .description-item {
             background-color: #fff3e0; /* Light Orange */
             border-right: 5px solid var(--primary-color);
-            font-weight: normal;
         }
 
         .factor-item:hover, .description-item:hover {
@@ -95,7 +99,7 @@
             line-height: 1.5;
             background-color: #fff;
             border: 1px solid var(--secondary-color);
-            display: none; /* Hidden until interaction */
+            display: none;
         }
 
         .correct {
@@ -133,12 +137,77 @@
         .reset-btn:hover {
             background-color: #0056b3;
         }
+
+        /* --- Pop-up Challenge Styling --- */
+        .challenge-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .challenge-box {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            text-align: center;
+            animation: bounceIn 0.5s ease-out;
+            max-width: 450px;
+            width: 90%;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            70% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+
+        .challenge-box h2 {
+            color: var(--error-color);
+            margin-top: 0;
+        }
+
+        .challenge-options button {
+            background-color: #f0f0f0;
+            border: 2px solid var(--secondary-color);
+            color: #333;
+            padding: 10px 20px;
+            margin: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .challenge-options button:hover {
+            background-color: #e9ecef;
+            transform: translateY(-1px);
+        }
+
+        .challenge-options button.correct-answer {
+            background-color: var(--success-color);
+            color: white;
+            border-color: var(--success-color);
+        }
+        
+        .challenge-options button.wrong-answer {
+            background-color: var(--error-color);
+            color: white;
+            border-color: var(--error-color);
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🌎 LOWERN Climate Factors: Matching Challenge</h1>
-        <p>Match the LOWERN Factor on the left to its correct description and effect on the right. Select one from each column to make a match.</p>
+        <h1>🌍 LOWERN Climate Factors: Visual Challenge</h1>
+        <p>Match the **Factor** on the left to its **Description** on the right. Correct matches trigger a Quick Quiz pop-up for extra points!</p>
         
         <div class="match-area">
             <ul class="factor-list" id="factor-list"></ul>
@@ -150,28 +219,67 @@
         <button class="reset-btn" onclick="initGame()">Reset Game</button>
     </div>
 
+    <div id="challenge-overlay" class="challenge-overlay" style="display: none;">
+        <div id="challenge-box" class="challenge-box">
+            <h2 id="challenge-title">Quick Quiz!</h2>
+            <p id="challenge-question"></p>
+            <div id="challenge-options" class="challenge-options">
+                </div>
+            <p id="challenge-result" style="margin-top: 15px; font-weight: bold;"></p>
+        </div>
+    </div>
+
     <script>
         const matches = [
             {
-                factor: "Latitude (L)",
+                factor: "Latitude (L) ☀️",
                 id: "L",
-                description: "Determines how concentrated or spread out the sun's energy is. Near the equator (0°), light is direct and concentrated (hot). Near the poles (60°N/S), it is indirect and spread out (cold)."
+                description: "Determines how concentrated or spread out the sun's energy is. Near the equator (0°), light is direct and concentrated (hot). [cite_start]Near the poles, it is indirect and spread out (cold)."[cite: 9, 11, 17, 24],
+                emoji: "☀️",
+                quiz: {
+                    question: "At the **equator (0°)**, the sunlight is...?",
+                    correct: "Directly Overhead / Concentrated",
+                    wrong1: "Low Angle / Spread Out",
+                    wrong2: "Blocked by Atmosphere"
+                }
             },
             {
-                factor: "Ocean Currents (O)",
+                factor: "Ocean Currents (O) 🌊",
                 id: "O",
-                description: "Like a 'river within the ocean.' Warm currents (e.g., Gulf Stream) carry heat, warming the air above it, which then affects the climate of nearby land."
+                description: "Like a 'river within the ocean.' [cite_start]Warm currents (e.g., Gulf Stream) carry heat, warming the air above it, which then affects the climate of nearby land."[cite: 39, 45, 47, 63],
+                emoji: "🌊",
+                quiz: {
+                    question: "The **North Atlantic Current** and **Gulf Stream** are examples of what kind of current?",
+                    correct: "Warm Currents (Red Arrows)",
+                    wrong1: "Cold Currents (Blue Arrows)",
+                    wrong2: "Arctic Currents"
+                }
             },
             {
-                factor: "Relief (R)",
+                factor: "Relief (R) ⛰️",
                 id: "R",
-                description: "Causes a 'rain shadow' effect. Moist air rises over a mountain, cools, and drops precipitation (rain) on the windward side, leaving only dry air for the leeward side."
+                [cite_start]description: "Causes a 'rain shadow' effect. Moist air rises over a mountain, cools, and drops precipitation (rain) on the **windward** side, leaving only dry air for the **leeward** side."[cite: 79, 83, 84, 104],
+                emoji: "⛰️",
+                quiz: {
+                    question: "According to the diagram, as air rises up a mountain, it gets...",
+                    correct: "Cooler (Air Expands)",
+                    wrong1: "Warmer (Air Compresses)",
+                    wrong2: "Moister (Condenses)"
+                }
             },
             {
-                factor: "Near Water (N)",
+                factor: "Near Water (N) 🧊",
                 id: "N",
-                description: "Large bodies of water take longer to heat up and cool down. This moderates the climate, making coastal areas cooler in summer and warmer in winter than inland areas."
-            }
+                [cite_start]description: "Large bodies of water take longer to heat up and cool down. This **moderates** the climate, making coastal areas cooler in summer and warmer in winter than inland areas."[cite: 115, 117, 119, 123],
+                emoji: "🧊",
+                quiz: {
+                    question: "During the **day** in summer, the wind typically blows from the **sea** to the **land** because the sea is...",
+                    correct: "Cooler than the land",
+                    wrong1: "Warmer than the land",
+                    wrong2: "Deeper than the land"
+                }
+            },
+            // Note: Elevation (E) is covered in the Relief quiz, Winds (W) is covered by Air Masses on page 2.
         ];
 
         let selectedFactor = null;
@@ -192,6 +300,7 @@
             document.getElementById('feedback').style.display = 'none';
             document.getElementById('feedback').className = '';
             document.getElementById('feedback').innerHTML = '';
+            closeChallenge();
 
             const factorList = document.getElementById('factor-list');
             const descriptionList = document.getElementById('description-list');
@@ -205,9 +314,10 @@
             shuffleArray(descriptionData);
 
             factorData.forEach(data => {
+                const match = matches.find(m => m.id === data.id);
                 const li = document.createElement('li');
                 li.className = 'factor-item';
-                li.textContent = data.text;
+                li.innerHTML = `<span class="emoji">${match.emoji}</span> ${data.text}`;
                 li.dataset.id = data.id;
                 li.onclick = () => selectFactor(li);
                 factorList.appendChild(li);
@@ -270,11 +380,13 @@
                     feedbackEl.innerHTML = `<span class="feedback-title">✅ Correct Match! (${matchInfo.factor})</span><br>
                                             **CONCEPT RULE**: ${matchInfo.description}`;
                     
+                    showChallenge(matchInfo); // TRIGGER NEW CHALLENGE
+                    
                 } else {
                     // Incorrect Match
                     feedbackEl.classList.add('incorrect');
                     feedbackEl.innerHTML = `<span class="feedback-title">❌ Incorrect Match!</span><br>
-                                            Try again. Remember: **${selectedFactor.textContent}** refers to the **${matchInfo.description.substring(0, 10).toLowerCase()}...** not this description.`;
+                                            Try again. Remember: **${selectedFactor.textContent}** refers to the mechanism it describes.`;
                 }
 
                 feedbackEl.style.display = 'block';
@@ -285,9 +397,65 @@
                     feedbackEl.classList.remove('incorrect');
                     feedbackEl.classList.add('correct');
                     feedbackEl.innerHTML = `<span class="feedback-title">🎉 Excellent Work! Game Complete!</span><br>
-                                            You've successfully mastered the key mechanisms of the LOWERN climate factors. Ready for your test!`;
+                                            You've successfully mastered the key mechanisms of the LOWERN climate factors. You're ready!`;
                 }
             }
+        }
+
+        // --- Challenge Functions ---
+
+        function showChallenge(match) {
+            const challengeOverlay = document.getElementById('challenge-overlay');
+            const questionEl = document.getElementById('challenge-question');
+            const optionsEl = document.getElementById('challenge-options');
+            const resultEl = document.getElementById('challenge-result');
+
+            questionEl.textContent = match.quiz.question;
+            resultEl.textContent = '';
+            optionsEl.innerHTML = '';
+            
+            const options = [
+                { text: match.quiz.correct, isCorrect: true },
+                { text: match.quiz.wrong1, isCorrect: false },
+                { text: match.quiz.wrong2, isCorrect: false }
+            ];
+            shuffleArray(options);
+
+            options.forEach(opt => {
+                const button = document.createElement('button');
+                button.textContent = opt.text;
+                button.onclick = () => checkChallengeAnswer(button, opt.isCorrect, optionsEl, resultEl);
+                optionsEl.appendChild(button);
+            });
+
+            challengeOverlay.style.display = 'flex';
+        }
+
+        function checkChallengeAnswer(clickedButton, isCorrect, optionsEl, resultEl) {
+            // Disable all buttons after selection
+            Array.from(optionsEl.children).forEach(btn => btn.disabled = true);
+            
+            if (isCorrect) {
+                clickedButton.classList.add('correct-answer');
+                resultEl.textContent = "✅ Great Job! That detail reinforces the concept.";
+                // Close after a brief delay
+                setTimeout(closeChallenge, 1500);
+            } else {
+                clickedButton.classList.add('wrong-answer');
+                resultEl.textContent = "❌ Not quite. Review the visual data!";
+                // Highlight the correct answer
+                Array.from(optionsEl.children).forEach(btn => {
+                    if (btn.textContent === matches.find(m => m.quiz.question === document.getElementById('challenge-question').textContent).quiz.correct) {
+                        btn.style.border = "2px solid var(--success-color)";
+                    }
+                });
+                // Close after a longer delay to read the feedback
+                setTimeout(closeChallenge, 3000); 
+            }
+        }
+
+        function closeChallenge() {
+            document.getElementById('challenge-overlay').style.display = 'none';
         }
 
         // Initialize the game when the page loads
