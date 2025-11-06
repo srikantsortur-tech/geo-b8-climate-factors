@@ -466,7 +466,9 @@
             descriptionList.innerHTML = '';
 
             const factorData = matches.map(m => ({ id: m.id, text: m.factor }));
-            const descriptionData = matches.map(m => ({ id: m.id, text: m.description, cue: matches.find(m => m.id === m.id).cue }));
+            
+            // Map descriptions to create an array with all the necessary data
+            const descriptionData = matches.map(m => ({ id: m.id, text: m.description, cue: m.cue }));
 
             shuffleArray(factorData);
             shuffleArray(descriptionData);
@@ -482,10 +484,10 @@
             });
 
             descriptionData.forEach(data => {
-                const match = matches.find(m => m.description === data.text);
                 const li = document.createElement('li');
                 li.className = 'description-item';
-                li.innerHTML = `<span class="cue">${match.cue}</span> ${data.text}`; // Added cue here
+                // Use the cue from the mapped data (which is correct)
+                li.innerHTML = `<span class="cue">${data.cue}</span> ${data.text}`;
                 li.dataset.id = data.id;
                 li.onclick = () => selectDescription(li);
                 descriptionList.appendChild(li);
