@@ -3,643 +3,772 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LOWERN Climate Factors Visual Challenge</title>
+    <title>Geologic Timeline Builder - Landform Mastery</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root {
-            --primary-color: #1e3a8a; /* Dark Blue */
-            --secondary-color: #6c757d;
-            --success-color: #10b981; /* Emerald Green */
-            --error-color: #ef4444; /* Red */
-            --bg-color: #f3f4f6; /* Light Gray */
-            --card-bg: #ffffff;
-            --font-family: 'Inter', sans-serif;
-        }
-
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
         body {
-            font-family: var(--font-family);
-            background-color: var(--bg-color);
-            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: #e0f2fe; /* Light Blue Background */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             padding: 20px;
         }
-
         .container {
-            max-width: 900px;
+            max-width: 1000px;
             width: 100%;
-            margin: auto;
-            background: var(--card-bg);
+            background-color: #ffffff;
             padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
-
-        h1 {
-            color: var(--primary-color);
+        .header {
             text-align: center;
             margin-bottom: 30px;
         }
-
-        .match-area {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
+        h1 {
+            color: #1d4ed8;
+            font-weight: 800;
         }
-
-        .factor-list, .description-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .factor-item, .description-item {
-            padding: 15px;
-            margin-bottom: 10px;
+        .step-card {
+            cursor: grab;
+            padding: 12px;
+            background-color: #fef3c7; /* Yellowish for Scrambled Steps */
             border-radius: 8px;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s, opacity 0.3s;
-            font-size: 1.05em;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-
-        .factor-item {
-            background-color: #e0f7fa; /* Light Blue */
-            border-left: 6px solid var(--primary-color);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.1s, opacity 0.3s, border 0.2s, box-shadow 0.2s;
+            font-size: 0.95rem;
             font-weight: 600;
+            /* margin handled by container, but ensure it's removed in slots */
+            border-left: 5px solid #d97706;
         }
-        
-        .factor-item .emoji {
-            margin-right: 8px;
-            font-size: 1.3em;
-        }
-
-        .description-item {
-            background-color: #fff3e0; /* Light Orange */
-            border-right: 6px solid var(--primary-color);
-        }
-
-        .description-item .cue {
-            margin-right: 8px;
-            font-size: 1.3em;
-            font-weight: bold;
-        }
-
-
-        .factor-item:hover:not(.correct), .description-item:hover:not(.correct) {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .selected {
-            border: 2px solid var(--success-color) !important;
-            box-shadow: 0 0 10px rgba(16, 185, 129, 0.7) !important;
-            background-color: #d1fae5 !important;
-        }
-        
-        .correct {
-            background-color: #d1fae5;
-            border-color: var(--success-color);
-            color: #065f46;
-            opacity: 0.5;
-            pointer-events: none;
-        }
-
-        .incorrect {
-            background-color: #fee2e2;
-            border-color: var(--error-color);
-            color: var(--error-color);
-        }
-
-        /* --- Global Button Styling --- */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 10px 20px;
-            margin: 0 10px;
-            border: none;
-            border-radius: 5px;
+        .step-card.selected {
+            border: 3px solid #1d4ed8; /* Blue border for selected state */
+            box-shadow: 0 0 10px #1d4ed8;
+            background-color: #c0d3fa; /* Lighter background for selection */
             cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.3s, transform 0.1s;
-            font-weight: 500;
         }
+        .step-card:active {
+            cursor: grabbing;
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        .source-box {
+            min-height: 150px;
+            padding: 15px;
+            border: 2px dashed #9ca3af;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex; /* Flexbox for consistent card spacing */
+            flex-wrap: wrap;
+            align-content: flex-start;
+        }
+        .source-box .step-card {
+            margin-right: 10px;
+            margin-bottom: 10px;
+            width: calc(50% - 10px); /* 2 columns on desktop */
+            box-sizing: border-box;
+        }
+        @media (max-width: 600px) {
+             .source-box .step-card {
+                width: 100%;
+                margin-right: 0;
+            }
+        }
+        .timeline-slot {
+            min-height: 60px;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 2px solid #3b82f6;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            background-color: #eff6ff; /* Light blue slot */
+            position: relative;
+            transition: background-color 0.3s, border-color 0.3s;
+            cursor: pointer; /* Indicate clickability */
+        }
+        .timeline-slot.hover {
+            background-color: #dbeafe;
+            border-color: #1d4ed8;
+        }
+        /* --- NEW VISUAL FEEDBACK STYLES --- */
+        .timeline-slot.slot-correct {
+            border-color: #10b981; /* Green border */
+            background-color: #e6ffed; /* Light green background */
+        }
+        .timeline-slot.slot-incorrect {
+            border-color: #ef4444; /* Red border */
+            background-color: #fce7e7; /* Light red background */
+        }
+        /* --------------------------------- */
 
-        .btn-primary {
-            background-color: var(--primary-color);
+        .slot-label {
+            font-weight: 700;
+            color: #1d4ed8;
+            margin-right: 15px;
+            min-width: 60px;
+            flex-shrink: 0;
+        }
+        .timeline-slot .step-card {
+            flex-grow: 1;
+            margin: 0 !important; /* Ensure no margin inside slot */
+            width: auto;
+        }
+        #timeline-area {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+        .target-landform {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #065f46;
+            text-align: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #d1fae5;
+            border-radius: 8px;
+            border: 2px solid #10b981;
+        }
+        .submit-btn {
+            padding: 12px 25px;
+            background-color: #065f46;
             color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            transition: background-color 0.2s;
         }
-
-        .btn-primary:hover {
-            background-color: #102e6c;
-            transform: translateY(-1px);
+        .submit-btn:hover {
+            background-color: #10b981;
         }
-
-        .reset-btn {
-            display: block;
-            width: 150px;
-            margin: 20px auto 0;
-        }
-
-        /* --- Pop-up Challenge Styling --- */
-        .challenge-overlay {
+        
+        /* Modal and Cheatsheet styles (unchanged) */
+        #feedback-modal, #cheatsheet-modal {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            display: flex;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none;
             justify-content: center;
             align-items: center;
             z-index: 1000;
         }
-
-        .challenge-box {
-            background: var(--card-bg);
+        .modal-content {
+            background-color: white;
             padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
-            text-align: center;
-            animation: bounceIn 0.5s ease-out;
-            max-width: 450px;
+            border-radius: 12px;
+            max-width: 600px;
             width: 90%;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+            position: relative;
         }
-
-        @keyframes bounceIn {
-            0% { transform: scale(0.5); opacity: 0; }
-            70% { transform: scale(1.05); opacity: 1; }
-            100% { transform: scale(1); }
-        }
-
-        .challenge-box h2 {
-            color: var(--primary-color);
-            margin-top: 0;
+        .modal-content.correct { border-left: 8px solid #10b981; }
+        .modal-content.incorrect { border-left: 8px solid #ef4444; }
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
             font-size: 1.5rem;
-        }
-
-        .challenge-options button {
-            background-color: #f0f0f0;
-            border: 2px solid #9ca3af;
-            color: #333;
-            padding: 10px 15px;
-            margin: 8px 5px;
-            border-radius: 8px;
             cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.2s, transform 0.1s;
-            width: 100%; 
-            max-width: 200px;
+            color: #9ca3af;
         }
-        
-        @media (min-width: 640px) {
-            .challenge-options button {
-                width: auto;
-            }
-        }
-
-        .challenge-options button:hover:not(:disabled) {
-            background-color: #e9ecef;
-            transform: translateY(-1px);
-        }
-
-        .challenge-options button.correct-answer {
-            background-color: var(--success-color);
-            color: white;
-            border-color: var(--success-color);
-        }
-        
-        .challenge-options button.wrong-answer {
-            background-color: var(--error-color);
-            color: white;
-            border-color: var(--error-color);
-        }
-
-        /* --- Review Panel Styling --- */
-        #review-panel {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.7s ease-in-out; /* Increased transition time */
-            background-color: #fff;
-            margin-top: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            padding: 0 20px;
-        }
-
-        #review-panel.open {
-            max-height: 2000px; /* Much larger height to prevent trimming */
+        .cheatsheet-content {
+            max-width: 800px;
+            width: 95%;
             padding: 20px;
+            background-color: white;
+            border-radius: 12px;
+        }
+        .correct-sequence-step {
+            padding: 8px;
+            margin-bottom: 5px;
+            background-color: #e6ffed;
+            border-left: 5px solid #10b981;
+            border-radius: 4px;
         }
 
-        .review-panel table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 15px;
-            font-size: 0.9em;
+        /* Diagnostic Explanation Style (unchanged) */
+        .diagnostic-explanation {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fef2f2; /* Light red background for emphasis */
+            border: 1px solid #f87171;
+            border-radius: 8px;
         }
-
-        .review-panel th, .review-panel td {
-            padding: 10px;
-            border: 1px solid #e5e7eb;
-            text-align: left;
-        }
-
-        .review-panel th {
-            background-color: #f3f4f6;
-            font-weight: 600;
-        }
-        
-        .review-panel h2 {
-            font-size: 1.3rem;
+        .diagnostic-explanation h5 {
+            color: #b91c1c;
             font-weight: 700;
-            color: var(--primary-color);
-            margin-top: 15px;
-            margin-bottom: 10px;
-            border-bottom: 2px solid #e5e7eb;
-            padding-bottom: 5px;
+            margin-bottom: 8px;
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1 class="text-3xl font-extrabold tracking-tight">🌎 LOWERN Climate Factors: Full Visual Challenge</h1>
-        <p class="text-center text-gray-600 mb-6">Match the **Factor** to its **Description**. Correct matches trigger a **Quick Quiz** pop-up to reinforce a key concept!</p>
-        
-        <div class="flex justify-center mb-4">
-            <button id="toggle-review-btn" class="btn btn-primary" onclick="toggleReviewPanel()">
-                <span id="btn-text">Open Review Sheet 📖</span>
+<body class="bg-gray-50">
+
+<div class="container">
+    <div class="header">
+        <h1 class="text-3xl font-extrabold">⏳ Geologic Timeline Builder</h1>
+        <p class="text-lg text-gray-600 mt-2">Drag-and-Drop OR Click-and-Place the formation steps into the correct chronological order.</p>
+        <div class="flex justify-center items-center mt-4 flex-wrap gap-4">
+            <div class="score-bar" id="score-bar">Score: 0 / 0</div>
+            <button class="px-4 py-2 bg-yellow-500 text-white font-semibold rounded-lg hover:bg-yellow-600 transition" onclick="showCheatsheet()">
+                Reference Cheatsheet 📚
             </button>
         </div>
+    </div>
 
-        <!-- Review Panel (Cheat Sheet) -->
-        <div id="review-panel" class="review-panel">
-            <h2 class="text-xl">LOWERN Climate Factors: Quick Review Sheet 💡</h2>
-            <p class="text-sm text-gray-500 mb-4">Use this chart if you get stuck!</p>
+    <div class="target-landform" id="target-landform"></div>
 
-            <h2 class="text-lg">L: Latitude ☀️ (Distance from the Equator)</h2>
-            <table>
-                <thead><tr><th>Concept</th><th>Effect</th><th>Key Terminology</th></tr></thead>
-                <tbody>
-                    <tr><td>**Direct Light** 🎯 (Near Equator)</td><td>The sun's energy is **concentrated** over a small area. 🔥</td><td>Concentrated, Hotter, Tropical/Low Latitude</td></tr>
-                    <tr><td>**Indirect Light** ↔️ (Near Poles)</td><td>The sun's energy is **spread out** over a large area. 🥶</td><td>Spread Out, Colder, Polar/High Latitude</td></tr>
-                </tbody>
-            </table>
-
-            <h2 class="text-lg">O: Ocean Currents 🌊 (Warm and Cold 'Rivers' in the Ocean)</h2>
-            <table>
-                <thead><tr><th>Concept</th><th>Effect</th><th>Key Terminology</th></tr></thead>
-                <tbody>
-                    <tr><td>**Warm Currents** ♨️ (e.g., Gulf Stream)</td><td>Transport heat to the coasts, making winter temperatures **milder**. 🧤</td><td>Moderation, Warming Influence</td></tr>
-                    <tr><td>**Cold Currents** 🧊 (e.g., Labrador Current)</td><td>Transport cold water, often leading to cooler, foggier conditions. 🌫️</td><td>Cooling Influence, Less Evaporation</td></tr>
-                </tbody>
-            </table>
-
-            <h2 class="text-lg">W: Winds & Air Masses 💨 (Large Bodies of Air)</h2>
-            <table>
-                <thead><tr><th>Concept</th><th>Effect</th><th>Key Terminology</th></tr></thead>
-                <tbody>
-                    <tr><td>**Air Mass Origin** 🗺️</td><td>Takes on the properties of where it forms.</td><td>**Maritime** 💧 (Moist), **Continental** 🏜️ (Dry)</td></tr>
-                    <tr><td>**Air Mass Temperature** 🌡️</td><td>Takes on the temperature of where it forms.</td><td>**Tropical** 🌴 (Warm), **Polar/Arctic** 🐻‍❄️ (Cold)</td></tr>
-                </tbody>
-            </table>
-            
-            <h2 class="text-lg">E: Elevation 🏔️ (Altitude above Sea Level)</h2>
-            <table>
-                <thead><tr><th>Concept</th><th>Effect</th><th>Key Terminology</th></tr></thead>
-                <tbody>
-                    <tr><td>**Rising Air** ⬆️</td><td>As air rises, it expands due to lower air pressure, causing it to **cool**. 📉</td><td>Cooler Temperatures, Decrease in Pressure</td></tr>
-                    <tr><td>**Temperature Rule**</td><td>Temperature drops approximately 0.6°C - 1.0°C per 100 meters. 📏</td><td>Altitude, Mountain Climate</td></tr>
-                </tbody>
-            </table>
-
-            <h2 class="text-lg">R: Relief ⛰️ (Mountains and Land Shape)</h2>
-            <table>
-                <thead><tr><th>Concept</th><th>Effect</th><th>Key Terminology</th></tr></thead>
-                <tbody>
-                    <tr><td>**Windward Side** 🌬️</td><td>Air rises, cools, moisture condenses, resulting in **heavy precipitation**. 🌧️</td><td>High Rainfall, Condensation</td></tr>
-                    <tr><td>**Leeward Side** ⬇️</td><td>Air descends, warms, resulting in dry conditions.</td><td>**Rain Shadow** 🔆, Dry, Deserts</td></tr>
-                </tbody>
-            </table>
-
-            <h2 class="text-lg">N: Near Water 💧 (Proximity to Oceans/Lakes)</h2>
-            <table>
-                <thead><tr><th>Concept</th><th>Effect</th><th>Key Terminology</th></tr></thead>
-                <tbody>
-                    <tr><td>**Water's Heat Capacity** 🔄</td><td>Water takes a long time to warm up and cool down.</td><td>**Continental Climate** 📈📉 (Extreme temperatures inland)</td></tr>
-                    <tr><td>**Moderating Effect** ⚖️</td><td>Coastlines have **cooler summers** and **warmer winters** than inland areas.</td><td>Maritime Climate, Moderation</td></tr>
-                </tbody>
-            </table>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
+        <!-- 1. Source Box: Scrambled Steps -->
+        <div>
+            <h2 class="text-xl font-bold text-gray-700 mb-3">Scrambled Formation Steps:</h2>
+            <div id="source-box" class="source-box bg-gray-100">
+                <!-- Draggable/Clickable step cards injected here -->
+            </div>
+            <button id="start-btn" class="submit-btn w-full mt-4" onclick="startGame()">Start Timeline</button>
         </div>
 
-        <!-- The actual game area -->
-        <div class="match-area mt-6">
-            <ul class="factor-list" id="factor-list"></ul>
-            <ul class="description-list" id="description-list"></ul>
+        <!-- 2. Target Timeline: Sequential Slots -->
+        <div>
+            <h2 class="text-xl font-bold text-gray-700 mb-3">Target Timeline:</h2>
+            
+            <!-- NEW STATUS MESSAGE DISPLAY -->
+            <div id="result-status" class="hidden text-center text-xl font-bold p-3 my-4 rounded-lg shadow-md transition-all"></div>
+            
+            <div id="timeline-area">
+                <!-- Drop slots injected here -->
+            </div>
+            <button id="submit-btn" class="submit-btn w-full mt-4 bg-blue-600 hover:bg-blue-700" onclick="checkTimeline()">Submit Timeline</button>
+        </div>
+    </div>
+</div>
+
+<!-- Feedback Modal -->
+<div id="feedback-modal">
+    <div id="modal-content" class="modal-content relative">
+        <span class="close-btn" onclick="hideFeedback()">&times;</span>
+        <h3 class="text-2xl font-bold mb-3" id="feedback-title"></h3>
+        
+        <p class="text-xl text-gray-700 mb-4" id="feedback-message"></p>
+        
+        <!-- NEW Diagnostic Explanation Section -->
+        <div id="diagnostic-section"></div>
+
+        <h4 class="text-lg font-bold text-green-700 mt-4 mb-2">✅ Correct Sequence:</h4>
+        <div id="correct-sequence-display">
+            <!-- Correct steps injected here -->
+        </div>
+
+        <button class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg" id="next-btn" onclick="nextQuestion()">Next Landform &rarr;</button>
+    </div>
+</div>
+
+<!-- Cheatsheet Modal (unchanged) -->
+<div id="cheatsheet-modal" onclick="hideCheatsheet(event)">
+    <div class="cheatsheet-content" onclick="event.stopPropagation()">
+        <span class="close-btn" onclick="hideCheatsheet()">&times;</span>
+        <h3 class="text-2xl font-bold text-gray-800 mb-4">📚 Landform Formation Cheatsheet</h3>
+        <p class="text-gray-600">The key to the Timeline Builder is understanding the **Sequence** (right column).</p>
+        
+        <h4 class="text-xl font-bold text-green-700 mt-6 mb-2">Key Landform Sequences:</h4>
+        <div id="cheatsheet-details" class="space-y-4 text-sm">
+            <!-- Full step-by-step sequences injected here -->
         </div>
         
-        <div id="feedback" class="mt-6 p-4 rounded-lg border text-center" style="display: none;"></div>
-
-        <button class="reset-btn btn btn-primary" onclick="initGame()">Reset Game</button>
+        <button class="mt-6 px-4 py-2 bg-blue-600 text-white rounded-lg" onclick="hideCheatsheet()">Close Cheatsheet</button>
     </div>
+</div>
 
-    <!-- Pop-up Challenge HTML -->
-    <div id="challenge-overlay" class="challenge-overlay" style="display: none;">
-        <div id="challenge-box" class="challenge-box">
-            <h2 id="challenge-title" class="font-bold">Quick Quiz! ⚡</h2>
-            <p id="challenge-question" class="text-gray-700 mb-4"></p>
-            <div id="challenge-options" class="challenge-options flex flex-wrap justify-center">
-                <!-- Buttons injected here -->
-            </div>
-            <p id="challenge-result" class="mt-4 font-bold"></p>
-        </div>
-    </div>
 
-    <script>
-        // Data for the game, including descriptive cues
-        const matches = [
-            {
-                factor: "Latitude (L) ☀️",
-                id: "L",
-                cue: "🎯", 
-                description: "Determines how concentrated (🎯, 🔥) or spread out (↔️, 🥶) the sun's energy is. Near the equator (0°), light is direct and concentrated (hot). Near the poles, it is indirect and spread out (cold).",
-                emoji: "☀️",
-                quiz: {
-                    question: "At the **equator (0°)**, the sunlight is...?",
-                    correct: "Directly Overhead / Concentrated",
-                    wrong1: "Low Angle / Spread Out",
-                    wrong2: "Blocked by Atmosphere"
-                }
-            },
-            {
-                factor: "Ocean Currents (O) 🌊",
-                id: "O",
-                cue: "🌡️", 
-                description: "Like a 'river within the ocean.' Warm currents (♨️) carry heat, warming the air (🧤), which then affects the climate of nearby land, making it milder. Cold currents (🧊) bring cooler, foggier conditions (🌫️).",
-                emoji: "🌊",
-                quiz: {
-                    question: "The **North Atlantic Current** and **Gulf Stream** are examples of what kind of current?",
-                    correct: "Warm Currents (Red Arrows)",
-                    wrong1: "Cold Currents (Blue Arrows)",
-                    wrong2: "Arctic Currents"
-                }
-            },
-            {
-                factor: "Winds & Air Masses (W) 💨",
-                id: "W",
-                cue: "🌬️", 
-                description: "Large volumes of air that take on temperature and moisture where they form (e.g., Maritime 💧 is moist; Continental 🏜️ is dry). They distribute weather: **Polar/Arctic** air (🐻‍❄️) is very cold and dry.",
-                emoji: "💨",
-                quiz: {
-                    question: "An air mass that forms over the **ocean** is called 'Maritime' and is generally...",
-                    correct: "Moist (High Humidity)",
-                    wrong1: "Dry (Low Humidity)",
-                    wrong2: "Always Tropical"
-                }
-            },
-            {
-                factor: "Elevation (E) 🌡️",
-                id: "E",
-                cue: "📉", 
-                description: "The height of land above sea level (altitude). As air rises (⬆️), it expands due to low pressure, causing it to **cool** (📉), making high places colder than low places.",
-                emoji: "🌡️",
-                quiz: {
-                    question: "What is the typical change in temperature as you go **higher** in elevation?",
-                    correct: "Temperature drops (gets colder)",
-                    wrong1: "Temperature rises (gets warmer)",
-                    wrong2: "Humidity always increases"
-                }
-            },
-            {
-                factor: "Relief (R) ⛰️",
-                id: "R",
-                cue: "🌧️", 
-                description: "Causes a 'rain shadow' effect. Moist air rises (🌬️) over a mountain, drops precipitation (🌧️) on the **windward** side, leaving only dry air to descend (⬇️) on the **leeward** side (**Rain Shadow 🔆**).",
-                emoji: "⛰️",
-                quiz: {
-                    question: "The dry area created on the downwind side of a mountain is called the...?",
-                    correct: "Rain Shadow",
-                    wrong1: "Condensation Zone",
-                    wrong2: "Arctic Front"
-                }
-            },
-            {
-                factor: "Near Water (N) 🧊",
-                id: "N",
-                cue: "↔️", 
-                description: "Water heats up and cools down slower (🔄) than land. This **moderates** (⚖️) the climate, making coastal areas cooler in summer and warmer in winter than inland areas (which experience **Continental Climate 📈📉**).",
-                emoji: "🧊",
-                quiz: {
-                    question: "A location far inland (e.g., central Saskatchewan) that experiences extreme temperature swings is said to have a...",
-                    correct: "Continental Climate",
-                    wrong1: "Maritime Climate",
-                    wrong2: "Tropical Climate"
-                }
+<script>
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    const formationSequences = [
+        { 
+            name: "Sea Arch / Sea Stack 🌊🗿", 
+            steps: [
+                "Large crack forms in the headland by hydraulic action (waves). 🌊",
+                "The crack grows into a cave by abrasion. ➡️",
+                "The cave breaks through the headland, forming a natural arch. 🌉",
+                "The arch is eroded by waves and eventually collapses. 💥",
+                "A tall, isolated rock pillar (stack) is left standing. 🗿"
+            ],
+            explanations: [
+                "", // Step 0 has no preceding error
+                "The crack must **grow** before it can break through. Erosion is a gradual process.", // Step 1
+                "The landform is an **arch** only when the cave **breaks through** the headland. This must happen before collapse.", // Step 2
+                "The arch must exist and be subjected to erosion before the ceiling can **collapse** to form a stack.", // Step 3
+                "The **collapse** (Step 4) leaves the final pillar, the **stack**. Collapse must precede the final state." // Step 4
+            ]
+        },
+        { 
+            name: "Arete (Glacial Ridge) 🧊🏔️", 
+            steps: [
+                "Snow gathers in hollows, forming circular corries (basins). ❄️",
+                "Glaciers cut back into the peak on two sides, eroding the corrie sidewalls. 🔪",
+                "The erosion processes converge, and the sharp ridge, the Arête, remains. 🗡️"
+            ],
+            explanations: [
+                "", // Step 0
+                "The **snow** must accumulate and form **glaciers** first (corries) before the ice can move and begin to **cut back** the mountain.", // Step 1
+                "The **cutting action** (erosion) must occur before the final **Arete** is formed by the convergence of the erosion lines." // Step 2
+            ]
+        },
+        { 
+            name: "V-Shaped Valley 🏞️🔽", 
+            steps: [
+                "A river begins to cut vertically down into the land. 💧",
+                "Water weathers the rock, exerting pressure downwards (downcutting). ⬇️",
+                "Materials from the river banks fall and are eroded (carried away). 🧹",
+                "The repeated downward cutting leaves a V-shape. 🏞️"
+            ],
+            explanations: [
+                "", // Step 0
+                "**Downcutting** is the specific mechanism of water pressure, and it must begin *after* the river starts to cut the land.", // Step 1
+                "The **materials** can only **fall** from the bank and be **carried away** *after* the downcutting has begun to destabilize the banks.", // Step 2
+                "The **V-shape** is the **final result** that appears *after* the cutting, falling, and carrying away has been repeated over time." // Step 3
+            ]
+        },
+        { 
+            name: "Kettle (Lake/Pond) 🧊💧", 
+            steps: [
+                "A glacier retreats, and large pieces of ice ('dead ice') break off. 🧊",
+                "Outwash (rocks and dirt) from the glacier surround and cover the dead ice. ⛰️",
+                "The dead ice eventually melts completely. ☀️",
+                "The space held by the ice collapses, leaving a hole behind (the kettle). 🕳️"
+            ],
+            explanations: [
+                "", // Step 0
+                "The **dead ice** must be **covered** by outwash *before* it can melt without immediately evaporating.", // Step 1
+                "The ice must be **covered** before it can **melt** completely underneath the sediment.", // Step 2
+                "The **collapse** is the final erosional event that creates the landform, which happens *after* all the ice has melted." // Step 3
+            ]
+        },
+        { 
+            name: "Esker (Glacial Ridge) 〰️🧊", 
+            steps: [
+                "Glaciers melt, and rivers form within or on top of them. 💧",
+                "These rivers carry rocks and debris (sediment). 🪨",
+                "The debris forms a river-bed *inside* the glacier. 🛌",
+                "When the glacier melts completely, the material is laid down, forming a ridge (Esker). 〰️"
+            ],
+            explanations: [
+                "", // Step 0
+                "The river must **form** *before* it can **carry** sediment.", // Step 1
+                "The river must **carry** the sediment *before* that sediment can **deposit** to form the river-bed.", // Step 2
+                "The **ridge** is the **final result** that appears on the ground *after* the glacier melts away." // Step 3
+            ]
+        }
+    ];
+
+    let currentSequenceIndex = 0;
+    let currentLandform = null;
+    let score = 0;
+    let totalAttempts = 0;
+    let totalLandforms = formationSequences.length;
+    let lastSubmissionCorrect = false; 
+    let activeCardId = null; // NEW: Track the currently selected card ID for click-and-place
+
+    const targetLandformEl = document.getElementById('target-landform');
+    const sourceBoxEl = document.getElementById('source-box');
+    const timelineAreaEl = document.getElementById('timeline-area');
+    const submitBtn = document.getElementById('submit-btn');
+    const startBtn = document.getElementById('start-btn');
+    const feedbackModal = document.getElementById('feedback-modal');
+    const scoreBarEl = document.getElementById('score-bar');
+    const cheatsheetModal = document.getElementById('cheatsheet-modal');
+    const resultStatusEl = document.getElementById('result-status'); 
+    const diagnosticSectionEl = document.getElementById('diagnostic-section'); 
+
+    // --- NEW: Click-and-Place Handlers ---
+
+    function selectCard(event) {
+        const card = event.currentTarget;
+        
+        // Deselect any previously selected card
+        document.querySelectorAll('.step-card.selected').forEach(c => c.classList.remove('selected'));
+        
+        // If the card is already the active card, deselect it and clear state
+        if (activeCardId === card.id) {
+            activeCardId = null;
+            return;
+        }
+
+        // Select the current card and set state
+        card.classList.add('selected');
+        activeCardId = card.id;
+    }
+
+    function handleSlotClick(event) {
+        const slot = event.currentTarget;
+        const cardInSlot = slot.querySelector('.step-card');
+        
+        if (activeCardId) {
+            // Case 1: A card is selected (activeCardId is set) -> Move selected card into this slot
+            const cardToMove = document.getElementById(activeCardId);
+            
+            if (cardInSlot) {
+                // If the slot has a card, send it back to the source box first
+                sourceBoxEl.appendChild(cardInSlot);
+                cardInSlot.style.margin = ''; // Source box manages margin via flex/CSS
             }
-        ];
+            
+            // Move selected card into the slot
+            slot.appendChild(cardToMove);
+            cardToMove.style.margin = '0'; // Clear margin in slot
+            
+            // Deselect card and reset state
+            cardToMove.classList.remove('selected');
+            activeCardId = null;
+            
+            resultStatusEl.style.display = 'none';
 
-        let selectedFactor = null;
-        let selectedDescription = null;
-        let matchedIds = [];
+        } else if (cardInSlot) {
+            // Case 2: No card is selected, but a card is in the slot -> Move card back to source box
+            sourceBoxEl.appendChild(cardInSlot);
+            cardInSlot.style.margin = ''; // Source box manages margin via flex/CSS
+            
+            resultStatusEl.style.display = 'none';
+        }
+    }
 
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
+
+    // --- Drag and Drop Handlers (Adapted for co-existence) ---
+
+    function allowDrop(event) {
+        event.preventDefault();
+        event.currentTarget.classList.add('hover');
+    }
+
+    function removeHover(event) {
+        event.preventDefault();
+        event.currentTarget.classList.remove('hover');
+    }
+
+    function drag(event) {
+        event.dataTransfer.setData("text/plain", event.target.id);
+        event.target.style.opacity = '0.5';
+        // Clear click selection state during drag
+        document.querySelectorAll('.step-card.selected').forEach(c => c.classList.remove('selected'));
+        activeCardId = null;
+    }
+    
+    function dragEnd(event) {
+        event.target.style.opacity = '1';
+    }
+
+    function drop(event) {
+        event.preventDefault();
+        removeHover(event);
+        
+        const dataId = event.dataTransfer.getData("text/plain");
+        const draggedElement = document.getElementById(dataId);
+        const slot = event.currentTarget;
+        
+        // If the slot already contains an element, move it back to the source box
+        const existingCard = slot.querySelector('.step-card');
+        if (existingCard) { 
+            sourceBoxEl.appendChild(existingCard);
+            existingCard.style.margin = ''; // Source box manages margin
+        }
+        
+        // Append the dragged element to the slot
+        slot.appendChild(draggedElement);
+        draggedElement.style.margin = '0'; // Clear margin in slot
+        
+        resultStatusEl.style.display = 'none';
+    }
+
+    // --- Game Logic ---
+
+    function generateTimelineSlots(stepCount) {
+        timelineAreaEl.innerHTML = '';
+        for (let i = 0; i < stepCount; i++) {
+            const slot = document.createElement('div');
+            slot.id = `slot-${i}`;
+            slot.className = 'timeline-slot';
+            slot.innerHTML = `<span class="slot-label">Step ${i + 1}:</span>`;
+            
+            slot.addEventListener('dragover', allowDrop);
+            slot.addEventListener('dragleave', removeHover);
+            slot.addEventListener('drop', drop);
+            slot.addEventListener('click', handleSlotClick); // Click handler for placement
+            
+            timelineAreaEl.appendChild(slot);
+        }
+    }
+
+    function generateStepCards(steps) {
+        sourceBoxEl.innerHTML = '';
+        activeCardId = null; // Clear active card state
+        
+        // Assign a unique ID and original index to each step
+        const stepData = steps.map((text, index) => ({ text, index }));
+        shuffleArray(stepData);
+        
+        stepData.forEach((data, i) => {
+            const card = document.createElement('div');
+            card.id = `card-${i}`;
+            card.setAttribute('data-correct-index', data.index); 
+            card.className = 'step-card';
+            card.setAttribute('draggable', true);
+            card.textContent = data.text;
+            
+            // Drag listeners
+            card.addEventListener('dragstart', drag);
+            card.addEventListener('dragend', dragEnd);
+            
+            // Click listener for selection
+            card.addEventListener('click', selectCard); 
+            
+            sourceBoxEl.appendChild(card);
+        });
+    }
+
+    function loadQuestion() {
+        if (currentSequenceIndex >= formationSequences.length) {
+            showFinalScore();
+            return;
+        }
+
+        submitBtn.disabled = false;
+        startBtn.style.display = 'none';
+        resultStatusEl.style.display = 'none'; 
+        lastSubmissionCorrect = false; 
+
+        currentLandform = formationSequences[currentSequenceIndex];
+        targetLandformEl.textContent = `Target: ${currentLandform.name}`;
+
+        generateTimelineSlots(currentLandform.steps.length);
+        generateStepCards(currentLandform.steps);
+        
+        feedbackModal.style.display = 'none';
+        
+        updateScoreDisplay();
+    }
+
+    function startGame() {
+        // Reset and shuffle sequence order
+        shuffleArray(formationSequences);
+        currentSequenceIndex = 0;
+        score = 0;
+        totalAttempts = 0;
+        lastSubmissionCorrect = false; 
+        loadQuestion();
+    }
+    
+    function nextQuestion() {
+        currentSequenceIndex++;
+        loadQuestion();
+    }
+
+    function checkTimeline() {
+        totalAttempts++;
+        let isCorrect = true;
+        const totalSteps = currentLandform.steps.length;
+        const sequenceDisplay = document.getElementById('correct-sequence-display');
+        sequenceDisplay.innerHTML = '';
+        diagnosticSectionEl.innerHTML = ''; 
+        
+        let allSlotsFilled = true;
+        let incorrectSlots = [];
+
+        // Clear previous visual feedback
+        document.querySelectorAll('.timeline-slot').forEach(slot => {
+            slot.classList.remove('slot-correct', 'slot-incorrect');
+        });
+        document.querySelectorAll('.step-card.selected').forEach(c => c.classList.remove('selected'));
+        activeCardId = null; // Deselect any active card
+
+        // 1. Check if all slots are filled and apply immediate color coding
+        for (let i = 0; i < totalSteps; i++) {
+            const slot = document.getElementById(`slot-${i}`);
+            const card = slot.querySelector('.step-card'); 
+            
+            if (!card) {
+                allSlotsFilled = false;
+                break; 
             }
-        }
-
-        function initGame() {
-            selectedFactor = null;
-            selectedDescription = null;
-            matchedIds = [];
             
-            const feedbackEl = document.getElementById('feedback');
-            feedbackEl.style.display = 'none';
-            feedbackEl.className = 'mt-6 p-4 rounded-lg border text-center';
-            feedbackEl.innerHTML = '';
+            const cardIndex = parseInt(card.getAttribute('data-correct-index'));
             
-            closeChallenge();
+            // 2. Apply visual feedback to the slot
+            if (cardIndex === i) {
+                slot.classList.add('slot-correct');
+            } else {
+                slot.classList.add('slot-incorrect');
+                isCorrect = false;
+                incorrectSlots.push({ step: i + 1, actualCardIndex: cardIndex });
+            }
 
-            const factorList = document.getElementById('factor-list');
-            const descriptionList = document.getElementById('description-list');
-            factorList.innerHTML = '';
-            descriptionList.innerHTML = '';
+            // 3. Generate the correct sequence display regardless of submission outcome
+            const correctStepEl = document.createElement('div');
+            correctStepEl.className = 'correct-sequence-step';
+            correctStepEl.innerHTML = `<strong>Step ${i + 1}:</strong> ${currentLandform.steps[i]}`;
+            sequenceDisplay.appendChild(correctStepEl);
+        }
+        
+        // --- Handle Submission State (Incomplete vs. Complete) ---
+        if (!allSlotsFilled) {
+            resultStatusEl.textContent = "⚠️ MISSING STEPS. Fill the timeline completely!";
+            resultStatusEl.className = 'text-center text-3xl font-bold p-3 my-4 bg-yellow-200 text-yellow-800 rounded-lg shadow-lg';
+            resultStatusEl.style.display = 'block';
+            totalAttempts--; // Don't count incomplete submissions
+            submitBtn.disabled = false;
+            return; 
+        }
 
-            const factorData = matches.map(m => ({ id: m.id, text: m.factor }));
+        // Set state for re-enable logic
+        lastSubmissionCorrect = isCorrect;
+
+        // Disable button while modal is visible (will be re-enabled in hideFeedback if incorrect)
+        submitBtn.disabled = true;
+
+        // 4. Show main result status (Green/Red Banner)
+        if (isCorrect) {
+            score++;
+            resultStatusEl.textContent = "✅ PERFECT TIMELINE!";
+            resultStatusEl.className = 'text-center text-3xl font-bold p-3 my-4 bg-green-200 text-green-800 rounded-lg shadow-lg';
+            diagnosticSectionEl.style.display = 'none';
+        } else {
+            resultStatusEl.textContent = "❌ SEQUENCE ERROR. CHECK RED SLOTS.";
+            resultStatusEl.className = 'text-center text-3xl font-bold p-3 my-4 bg-red-200 text-red-800 rounded-lg shadow-lg';
             
-            // Map descriptions to create an array with all the necessary data
-            const descriptionData = matches.map(m => ({ id: m.id, text: m.description, cue: m.cue }));
+            // 5. Generate Diagnostic Explanation
+            const diagnosis = document.createElement('div');
+            diagnosis.className = 'diagnostic-explanation';
+            diagnosis.innerHTML = `<h5>🛑 Analysis of Incorrect Steps:</h5>`;
+            
+            incorrectSlots.forEach(error => {
+                const incorrectExplanation = currentLandform.explanations[error.step - 1];
+                const correctStepText = currentLandform.steps[error.step - 1];
 
-            shuffleArray(factorData);
-            shuffleArray(descriptionData);
-
-            factorData.forEach(data => {
-                const match = matches.find(m => m.id === data.id);
-                const li = document.createElement('li');
-                li.className = 'factor-item';
-                li.innerHTML = `<span class="emoji">${match.emoji}</span> ${data.text}`;
-                li.dataset.id = data.id;
-                li.onclick = () => selectFactor(li);
-                factorList.appendChild(li);
-            });
-
-            descriptionData.forEach(data => {
-                const li = document.createElement('li');
-                li.className = 'description-item';
-                // Use the cue from the mapped data (which is correct)
-                li.innerHTML = `<span class="cue">${data.cue}</span> ${data.text}`;
-                li.dataset.id = data.id;
-                li.onclick = () => selectDescription(li);
-                descriptionList.appendChild(li);
-            });
-        }
-
-        function clearSelections() {
-            document.querySelectorAll('.factor-item:not(.correct), .description-item:not(.correct)').forEach(el => {
-                el.classList.remove('selected');
-            });
-            selectedFactor = null;
-            selectedDescription = null;
-        }
-
-        function selectFactor(element) {
-            if (matchedIds.includes(element.dataset.id)) return;
-            document.querySelectorAll('.factor-item:not(.correct)').forEach(el => el.classList.remove('selected'));
-            element.classList.add('selected');
-            selectedFactor = element;
-            checkMatch();
-        }
-
-        function selectDescription(element) {
-            if (matchedIds.includes(element.dataset.id)) return;
-            document.querySelectorAll('.description-item:not(.correct)').forEach(el => el.classList.remove('selected'));
-            element.classList.add('selected');
-            selectedDescription = element;
-            checkMatch();
-        }
-
-        function checkMatch() {
-            const feedbackEl = document.getElementById('feedback');
-            feedbackEl.style.display = 'none';
-            feedbackEl.className = 'mt-6 p-4 rounded-lg border text-center';
-
-            if (selectedFactor && selectedDescription) {
-                const factorId = selectedFactor.dataset.id;
-                const descId = selectedDescription.dataset.id;
-                const matchInfo = matches.find(m => m.id === factorId);
-
-                if (factorId === descId) {
-                    // Correct Match
-                    matchedIds.push(factorId);
-                    
-                    selectedFactor.classList.add('correct');
-                    selectedDescription.classList.add('correct');
-                    selectedFactor.onclick = null;
-                    selectedDescription.onclick = null;
-                    
-                    feedbackEl.classList.add('correct', 'border-green-500', 'bg-green-100', 'text-green-800');
-                    feedbackEl.innerHTML = `<span class="font-bold block mb-1">✅ Correct Match! (${matchInfo.factor})</span>
-                                            **CONCEPT RULE**: ${matchInfo.description}`;
-                    
-                    showChallenge(matchInfo); // TRIGGER NEW CHALLENGE
-                    
-                } else {
-                    // Incorrect Match
-                    feedbackEl.classList.add('incorrect', 'border-red-500', 'bg-red-100', 'text-red-800');
-                    feedbackEl.innerHTML = `<span class="font-bold block mb-1">❌ Incorrect Match!</span>
-                                            Try again. Remember: **${selectedFactor.textContent}** refers to the specific physical mechanism that influences climate.`;
-                }
-
-                feedbackEl.style.display = 'block';
-                clearSelections();
+                const incorrectElement = document.getElementById(`slot-${error.step - 1}`).querySelector('.step-card');
+                const incorrectText = incorrectElement ? incorrectElement.textContent : "Missing Step";
                 
-                // Check for game completion
-                if (matchedIds.length === matches.length) {
-                    feedbackEl.classList.remove('incorrect', 'border-red-500', 'bg-red-100', 'text-red-800');
-                    feedbackEl.classList.add('correct', 'border-green-500', 'bg-green-100', 'text-green-800');
-                    feedbackEl.innerHTML = `<span class="font-bold block mb-1 text-2xl">🎉 ALL FACTORS MASTERED!</span>
-                                            You've successfully matched all six LOWERN factors and crushed the quick quizzes. You're ready for the test!`;
-                }
-            }
-        }
-
-        // --- Challenge Functions (Same) ---
-
-        function showChallenge(match) {
-            const challengeOverlay = document.getElementById('challenge-overlay');
-            const questionEl = document.getElementById('challenge-question');
-            const optionsEl = document.getElementById('challenge-options');
-            const resultEl = document.getElementById('challenge-result');
-
-            questionEl.textContent = match.quiz.question;
-            resultEl.textContent = '';
-            optionsEl.innerHTML = '';
-            
-            const options = [
-                { text: match.quiz.correct, isCorrect: true },
-                { text: match.quiz.wrong1, isCorrect: false },
-                { text: match.quiz.wrong2, isCorrect: false }
-            ];
-            shuffleArray(options);
-
-            options.forEach(opt => {
-                const button = document.createElement('button');
-                button.textContent = opt.text;
-                button.onclick = () => checkChallengeAnswer(button, opt.isCorrect, optionsEl, resultEl, match.quiz.correct);
-                optionsEl.appendChild(button);
+                diagnosis.innerHTML += `
+                    <p class="mb-2"><strong>Error at Step ${error.step} (Red Slot):</strong> You placed: <em>"${incorrectText}"</em></p>
+                    <p class="mb-2 pl-4"><strong>Must be:</strong> <em>"${correctStepText}"</em></p>
+                    <p class="mb-3 pl-4 text-sm text-gray-700 italic"><strong>Reason:</strong> ${incorrectExplanation}</p>
+                `;
             });
 
-            challengeOverlay.style.display = 'flex';
+            diagnosticSectionEl.appendChild(diagnosis);
+            diagnosticSectionEl.style.display = 'block';
         }
+        resultStatusEl.style.display = 'block';
 
-        function checkChallengeAnswer(clickedButton, isCorrect, optionsEl, resultEl, correctText) {
-            // Disable all buttons after selection
-            Array.from(optionsEl.children).forEach(btn => btn.disabled = true);
-            
+        // 6. Show detailed feedback modal after a small delay 
+        setTimeout(() => {
+            const titleEl = document.getElementById('feedback-title');
+            const messageEl = document.getElementById('feedback-message');
+            const nextBtn = document.getElementById('next-btn');
+
             if (isCorrect) {
-                clickedButton.classList.add('correct-answer');
-                resultEl.classList.remove('text-red-600');
-                resultEl.classList.add('text-green-600');
-                resultEl.textContent = "✅ Great Job! That detail reinforces the concept.";
-                // Close after a brief delay
-                setTimeout(closeChallenge, 1500);
+                titleEl.textContent = `✅ Mastery Achieved!`;
+                messageEl.textContent = `You perfectly sequenced the formation of the ${currentLandform.name}. Great job on the chronological flow!`;
+                modalContent.className = 'modal-content correct';
             } else {
-                clickedButton.classList.add('wrong-answer');
-                resultEl.classList.remove('text-green-600');
-                resultEl.classList.add('text-red-600');
-                resultEl.textContent = "❌ Not quite. Review the visual data!";
-                
-                // Highlight the correct answer
-                Array.from(optionsEl.children).forEach(btn => {
-                    if (btn.textContent === correctText) {
-                        btn.classList.add('correct-answer');
-                    }
-                });
-                // Close after a longer delay to read the feedback
-                setTimeout(closeChallenge, 3000); 
+                titleEl.textContent = `❌ Sequence Incorrect.`;
+                messageEl.textContent = `You had an error in your timeline. Use the analysis above and compare your red slots to the correct sequence below to see where the timing went wrong.`;
+                modalContent.className = 'modal-content incorrect';
             }
+
+            nextBtn.textContent = (currentSequenceIndex + 1) < totalLandforms ? 'Next Landform →' : 'Finish Review';
+            feedbackModal.style.display = 'flex';
+        }, 500); 
+
+        updateScoreDisplay();
+    }
+
+    function showFinalScore() {
+        targetLandformEl.textContent = `Game Over!`;
+        sourceBoxEl.innerHTML = '';
+        resultStatusEl.style.display = 'none';
+        timelineAreaEl.innerHTML = `
+            <div class="p-8 text-center bg-green-50 rounded-lg">
+                <h2 class="text-3xl font-bold text-green-700">Congratulations, Apex Master!</h2>
+                <p class="text-xl mt-3">You completed all ${totalLandforms} timelines.</p>
+                <p class="text-2xl font-extrabold mt-4">Final Score: ${score} / ${totalAttempts}</p>
+                <button class="submit-btn mt-6 bg-blue-600 hover:bg-blue-700" onclick="startGame()">Start a New Game</button>
+            </div>
+        `;
+    }
+
+    function updateScoreDisplay() {
+        scoreBarEl.textContent = `Score: ${score} / ${totalAttempts} (Landforms Attempted: ${currentSequenceIndex})`;
+    }
+
+    function hideFeedback(event) {
+        // Ensure modal is hidden
+        feedbackModal.style.display = 'none';
+        
+        // If the last submission was incorrect, re-enable the submit button
+        // so the user can rearrange and try again.
+        if (!lastSubmissionCorrect) {
+            submitBtn.disabled = false;
         }
 
-        function closeChallenge() {
-            document.getElementById('challenge-overlay').style.display = 'none';
-        }
+        // Note: The original logic for showFinalScore check using `landformsQueue` and `currentCardContainer`
+        // does not apply here since this is a timeline builder, but keeping the cleanup logic concise.
+    }
 
-        // --- New Toggle Functionality ---
-        function toggleReviewPanel() {
-            const panel = document.getElementById('review-panel');
-            const btnText = document.getElementById('btn-text');
+
+    // --- Cheatsheet Logic (Unchanged) ---
+
+    function generateCheatsheetDetails() {
+        const cheatsheetDetailsEl = document.getElementById('cheatsheet-details');
+        cheatsheetDetailsEl.innerHTML = '';
+
+        formationSequences.forEach(lf => {
+            const detailBlock = document.createElement('div');
+            detailBlock.className = 'p-3 bg-gray-50 rounded-lg border border-gray-200';
             
-            if (panel.classList.contains('open')) {
-                panel.classList.remove('open');
-                btnText.textContent = 'Open Review Sheet 📖';
-            } else {
-                panel.classList.add('open');
-                btnText.textContent = 'Close Review Sheet ❌';
-            }
-        }
+            let stepsHtml = lf.steps.map((step, index) => 
+                `<div class="flex items-start text-gray-700"><span class="font-bold mr-2 text-blue-600">${index + 1}.</span> ${step}</div>`
+            ).join('');
 
-        // Initialize the game when the page loads
-        document.addEventListener('DOMContentLoaded', initGame);
-    </script>
+            detailBlock.innerHTML = `
+                <h5 class="text-lg font-bold text-green-700 mb-2">${lf.name} Sequence:</h5>
+                ${stepsHtml}
+            `;
+            cheatsheetDetailsEl.appendChild(detailBlock);
+        });
+    }
+
+    function showCheatsheet() {
+        generateCheatsheetDetails();
+        cheatsheetModal.style.display = 'flex';
+    }
+
+    function hideCheatsheet(event) {
+        if (!event || event.target === cheatsheetModal || event.target.className.includes('close-btn') || event.target.tagName === 'BUTTON') {
+            cheatsheetModal.style.display = 'none';
+        }
+    }
+
+    // --- Initialization ---
+
+    window.onload = () => {
+        targetLandformEl.textContent = 'Welcome to the Timeline Builder!';
+        submitBtn.style.display = 'block';
+        submitBtn.disabled = false;
+        startBtn.style.display = 'block';
+        updateScoreDisplay();
+    };
+</script>
+
 </body>
 </html>
