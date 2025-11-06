@@ -218,7 +218,7 @@
         #review-panel {
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.5s ease-in-out;
+            transition: max-height 0.7s ease-in-out; /* Increased transition time */
             background-color: #fff;
             margin-top: 20px;
             border-radius: 8px;
@@ -227,7 +227,7 @@
         }
 
         #review-panel.open {
-            max-height: 800px; /* Large enough to show all content */
+            max-height: 2000px; /* Much larger height to prevent trimming */
             padding: 20px;
         }
 
